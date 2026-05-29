@@ -16,7 +16,7 @@ local ThemeManager = {} do
 		['Quartz'] 			= { 9, httpService:JSONDecode('{"FontColor":"ffffff","MainColor":"232330","AccentColor":"426e87","BackgroundColor":"1d1b26","OutlineColor":"27232f"}') },
 		['Inferno'] 		= { 10, httpService:JSONDecode('{"FontColor":"ffffff","MainColor":"141414","AccentColor":"a34848","BackgroundColor":"181818","OutlineColor":"141414"}') },
 		['Neverlose']		= { 11, httpService:JSONDecode('{"FontColor":"ffffff","MainColor":"242424","AccentColor":"0679b0","BackgroundColor":"1c1c1c","OutlineColor":"373737"}') },
-		['GameSense']		= { 12, httpService:JSONDecode('{"FontColor":"ffffff","MainColor":"181818","AccentColor":"4cb800","BackgroundColor":"141414","OutlineColor":"1f1f1f"}') },
+		['GameSense']		= { 12, httpService:JSONDecode('{"FontColor":"ffffff","MainColor":"181818","AccentColor":"4cb800","BackgroundColor":"141414","OutlineColor":"1f1f1f"}') }
 	}
 
 	function ThemeManager:ApplyTheme(theme)
