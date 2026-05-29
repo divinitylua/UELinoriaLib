@@ -3266,21 +3266,23 @@ function Library:CreateWindow(...)
         BorderColor3 = 'OutlineColor';
     });
 
-    -- Decorative corner circle (bottom-right of window)
-    local CornerDot = Library:Create('Frame', {
-        AnchorPoint     = Vector2.new(1, 1);
+    -- Decorative quarter-circle in the bottom-right corner
+    Outer.ClipsDescendants = true;
+    local CornerCircle = Library:Create('Frame', {
+        AnchorPoint      = Vector2.new(0.5, 0.5);
         BackgroundColor3 = Library.AccentColor;
-        BorderSizePixel = 0;
-        Position        = UDim2.new(1, -5, 1, -5);
-        Size            = UDim2.new(0, 7, 0, 7);
-        ZIndex          = 10;
-        Parent          = Inner;
+        BackgroundTransparency = 0.65;
+        BorderSizePixel  = 0;
+        Position         = UDim2.new(1, 0, 1, 0);
+        Size             = UDim2.fromOffset(90, 90);
+        ZIndex           = 10;
+        Parent           = Inner;
     });
     Library:Create('UICorner', {
         CornerRadius = UDim.new(1, 0);
-        Parent       = CornerDot;
+        Parent       = CornerCircle;
     });
-    Library:AddToRegistry(CornerDot, {
+    Library:AddToRegistry(CornerCircle, {
         BackgroundColor3 = 'AccentColor';
     });
     function Window:SetWindowTitle(Title)
