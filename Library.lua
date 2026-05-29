@@ -48,7 +48,7 @@ local Library = {
     ScreenGui = ScreenGui;
 
     Toggled = false;
-    WireframeDrag = false;
+    WireframeDrag = true;
     UseBlur = false;
     BlurSize = 15;
 
@@ -3113,7 +3113,7 @@ function Library:CreateWindow(...)
     if type(Config.TabPadding) ~= 'number' then Config.TabPadding = 0 end
     if type(Config.MenuFadeTime) ~= 'number' then Config.MenuFadeTime = 0.2 end
 
-    if typeof(Config.Size) ~= 'UDim2' then Config.Size = UDim2.fromOffset(550, 600) end
+    if typeof(Config.Size) ~= 'UDim2' then Config.Size = UDim2.fromOffset(530, 640) end
     if typeof(Config.Position) ~= 'UDim2' then Config.Position = UDim2.fromOffset(175, 50) end
 
     if InputService.TouchEnabled then
@@ -3264,6 +3264,24 @@ function Library:CreateWindow(...)
     Library:AddToRegistry(TabContainer, {
         BackgroundColor3 = 'MainColor';
         BorderColor3 = 'OutlineColor';
+    });
+
+    -- Decorative corner circle (bottom-right of window)
+    local CornerDot = Library:Create('Frame', {
+        AnchorPoint     = Vector2.new(1, 1);
+        BackgroundColor3 = Library.AccentColor;
+        BorderSizePixel = 0;
+        Position        = UDim2.new(1, -5, 1, -5);
+        Size            = UDim2.new(0, 7, 0, 7);
+        ZIndex          = 10;
+        Parent          = Inner;
+    });
+    Library:Create('UICorner', {
+        CornerRadius = UDim.new(1, 0);
+        Parent       = CornerDot;
+    });
+    Library:AddToRegistry(CornerDot, {
+        BackgroundColor3 = 'AccentColor';
     });
     function Window:SetWindowTitle(Title)
         WindowLabel.Text = Title;
