@@ -1,3 +1,4 @@
+
 local httpService = game:GetService('HttpService')
 
 local SaveManager = {} do
@@ -252,7 +253,7 @@ local SaveManager = {} do
 				overwriteConfirming = true
 				setRisk(overwriteBtn, 'are you sure?')
 				if overwriteTimer then task.cancel(overwriteTimer) end
-				overwriteTimer = task.delay(1, function()
+				overwriteTimer = task.delay(0.5, function()
 					overwriteConfirming = false
 					resetLabel(overwriteBtn, 'overwrite config')
 				end)
@@ -272,7 +273,7 @@ local SaveManager = {} do
 				deleteConfirming = true
 				setRisk(deleteBtn, 'are you sure?')
 				if deleteTimer then task.cancel(deleteTimer) end
-				deleteTimer = task.delay(1, function()
+				deleteTimer = task.delay(0.5, function()
 					deleteConfirming = false
 					resetLabel(deleteBtn, 'delete config')
 				end)
