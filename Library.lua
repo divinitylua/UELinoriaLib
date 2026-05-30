@@ -2844,7 +2844,7 @@ do
         Parent = WatermarkOuter;
     });
     Library:AddToRegistry(WatermarkInner, {
-        BorderColor3 = 'OutlineColor';
+        BorderColor3 = 'AccentColor';
     });
     local InnerFrame = Library:Create('Frame', {
         BackgroundColor3 = Color3.new(1, 1, 1);
