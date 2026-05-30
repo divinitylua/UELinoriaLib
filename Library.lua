@@ -3266,12 +3266,12 @@ function Library:CreateWindow(...)
         BorderColor3 = 'OutlineColor';
     });
 
-    -- Decorative quarter-circle in the bottom-right corner
+    -- circle (thanks claude for doing the work for me)
     Outer.ClipsDescendants = true;
     local CornerCircle = Library:Create('Frame', {
         AnchorPoint      = Vector2.new(0.5, 0.5);
         BackgroundColor3 = Library.AccentColor;
-        BackgroundTransparency = 0.78;
+        BackgroundTransparency = 0.5;
         BorderSizePixel  = 0;
         Position         = UDim2.new(1, 0, 1, 0);
         Size             = UDim2.fromOffset(46, 46);
