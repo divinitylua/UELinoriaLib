@@ -3271,10 +3271,10 @@ function Library:CreateWindow(...)
     local CornerCircle = Library:Create('Frame', {
         AnchorPoint      = Vector2.new(0.5, 0.5);
         BackgroundColor3 = Library.AccentColor;
-        BackgroundTransparency = 0.65;
+        BackgroundTransparency = 0.78;
         BorderSizePixel  = 0;
         Position         = UDim2.new(1, 0, 1, 0);
-        Size             = UDim2.fromOffset(90, 90);
+        Size             = UDim2.fromOffset(46, 46);
         ZIndex           = 10;
         Parent           = Inner;
     });
