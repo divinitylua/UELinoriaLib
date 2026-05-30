@@ -3265,8 +3265,6 @@ function Library:CreateWindow(...)
         BackgroundColor3 = 'MainColor';
         BorderColor3 = 'OutlineColor';
     });
-
-    -- circle (thanks claude for doing the work for me)
     Outer.ClipsDescendants = true;
     local CornerCircle = Library:Create('Frame', {
         AnchorPoint      = Vector2.new(0.5, 0.5);
