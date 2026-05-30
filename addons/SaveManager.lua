@@ -133,7 +133,7 @@ local SaveManager = {} do
 
 	function SaveManager:IgnoreThemeSettings()
 		self:SetIgnoreIndexes({ 
-			"BackgroundColor", "MainColor", "AccentColor", "OutlineColor", "FontColor", -- themes
+			"BackgroundColor", "MainColor", "AccentColor", "OutlineColor", "FontColor", "RiskColor", -- themes
 			"ThemeManager_ThemeList", 'ThemeManager_CustomThemeList', 'ThemeManager_CustomThemeName', -- themes
 		})
 	end
@@ -203,70 +203,118 @@ local SaveManager = {} do
 		assert(self.Library, 'Must set SaveManager.Library')
 
 		local section = tab:AddRightGroupbox('configuration')
+		local lib = self.Library
 
 		section:AddInput('SaveManager_ConfigName',    { Text = 'config name' })
 		section:AddDropdown('SaveManager_ConfigList', { Text = 'config list', Values = self:RefreshConfigList(), AllowNull = true })
 
 		section:AddDivider()
 
+		-- create config | load config
 		section:AddButton('create config', function()
 			local name = Options.SaveManager_ConfigName.Value
-
-			if name:gsub(' ', '') == '' then 
-				return self.Library:Notify('invalid config name (empty)', 2)
+			if name:gsub(' ', '') == '' then
+				return lib:Notify('invalid config name (empty)', 2)
 			end
-
 			local success, err = self:Save(name)
 			if not success then
-				return self.Library:Notify('failed to save config: ' .. err)
+				return lib:Notify('failed to save config: ' .. err)
 			end
-
-			self.Library:Notify(string.format('created config %q', name))
-
+			lib:Notify(string.format('created config %q', name))
 			Options.SaveManager_ConfigList:SetValues(self:RefreshConfigList())
 			Options.SaveManager_ConfigList:SetValue(nil)
 		end):AddButton('load config', function()
 			local name = Options.SaveManager_ConfigList.Value
-
 			local success, err = self:Load(name)
 			if not success then
-				return self.Library:Notify('failed to load config: ' .. err)
+				return lib:Notify('failed to load config: ' .. err)
 			end
-
-			self.Library:Notify(string.format('loaded config %q', name))
+			lib:Notify(string.format('loaded config %q', name))
 		end)
 
-		section:AddButton('overwrite config', function()
-			local name = Options.SaveManager_ConfigList.Value
-
-			local success, err = self:Save(name)
-			if not success then
-				return self.Library:Notify('failed to overwrite config: ' .. err)
+		-- overwrite config (confirm in risk color) | delete config (confirm in risk color)
+		local overwriteConfirming, overwriteTimer = false, nil
+		local overwriteBtn
+		overwriteBtn = section:AddButton('overwrite config', function()
+			local riskColor = lib.RiskColor or Color3.fromRGB(255, 50, 50)
+			if not overwriteConfirming then
+				overwriteConfirming = true
+				overwriteBtn.Label.Text = 'are you sure?'
+				overwriteBtn.Label.TextColor3 = riskColor
+				if overwriteTimer then task.cancel(overwriteTimer) end
+				overwriteTimer = task.delay(3, function()
+					overwriteConfirming = false
+					overwriteBtn.Label.Text = 'overwrite config'
+					overwriteBtn.Label.TextColor3 = lib.FontColor
+				end)
+			else
+				if overwriteTimer then task.cancel(overwriteTimer) end
+				overwriteConfirming = false
+				overwriteBtn.Label.Text = 'overwrite config'
+				overwriteBtn.Label.TextColor3 = lib.FontColor
+				local name = Options.SaveManager_ConfigList.Value
+				local success, err = self:Save(name)
+				if not success then
+					return lib:Notify('failed to overwrite config: ' .. err)
+				end
+				lib:Notify(string.format('overwrote config %q', name))
 			end
-
-			self.Library:Notify(string.format('overwrote config %q', name))
 		end)
 
+		local deleteConfirming, deleteTimer = false, nil
+		local deleteBtn
+		deleteBtn = overwriteBtn:AddButton('delete config', function()
+			local riskColor = lib.RiskColor or Color3.fromRGB(255, 50, 50)
+			if not deleteConfirming then
+				deleteConfirming = true
+				deleteBtn.Label.Text = 'are you sure?'
+				deleteBtn.Label.TextColor3 = riskColor
+				if deleteTimer then task.cancel(deleteTimer) end
+				deleteTimer = task.delay(3, function()
+					deleteConfirming = false
+					deleteBtn.Label.Text = 'delete config'
+					deleteBtn.Label.TextColor3 = lib.FontColor
+				end)
+			else
+				if deleteTimer then task.cancel(deleteTimer) end
+				deleteConfirming = false
+				deleteBtn.Label.Text = 'delete config'
+				deleteBtn.Label.TextColor3 = lib.FontColor
+				local name = Options.SaveManager_ConfigList.Value
+				if not name then
+					return lib:Notify('no config selected')
+				end
+				local path = self.Folder .. '/settings/' .. name .. '.json'
+				if isfile(path) then
+					delfile(path)
+					lib:Notify(string.format('deleted config %q', name))
+				else
+					lib:Notify('config file not found')
+				end
+				Options.SaveManager_ConfigList:SetValues(self:RefreshConfigList())
+				Options.SaveManager_ConfigList:SetValue(nil)
+			end
+		end)
+
+		-- refresh list
 		section:AddButton('refresh list', function()
 			Options.SaveManager_ConfigList:SetValues(self:RefreshConfigList())
 			Options.SaveManager_ConfigList:SetValue(nil)
 		end)
 
+		-- set autoload | remove autoload
 		section:AddButton('set autoload', function()
 			local name = Options.SaveManager_ConfigList.Value
-			if (not name) then
-				return;
-			end;
+			if not name then return end
 			writefile(self.Folder .. '/settings/autoload.txt', name)
 			SaveManager.AutoloadLabel:SetText('current autoload config: ' .. name)
-			self.Library:Notify(string.format('set %q to auto load', name))
+			lib:Notify(string.format('set %q to auto load', name))
 		end):AddButton('remove autoload', function()
-			local name = Options.SaveManager_ConfigList.Value
-			if (isfile(self.Folder .. '/settings/autoload.txt')) then
-				delfile(self.Folder .. '/settings/autoload.txt');
-			end;
+			if isfile(self.Folder .. '/settings/autoload.txt') then
+				delfile(self.Folder .. '/settings/autoload.txt')
+			end
 			SaveManager.AutoloadLabel:SetText('current autoload config: none')
-			self.Library:Notify("removed autoload");
+			lib:Notify('removed autoload')
 		end)
 
 		SaveManager.AutoloadLabel = section:AddLabel('current autoload config: none', true)
