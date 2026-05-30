@@ -19,11 +19,11 @@
       https://github.com/violin-suzutsuki/LinoriaLib/blob/main/Example.lua                
 --]]
 
-local repo = 'https://raw.githubusercontent.com/xyznick/UELinoriaLib/main/'
+local repo = "https://raw.githubusercontent.com/xyznick/UELinoriaLib/main/"
 
-local Library      = loadstring(game:HttpGet(repo .. 'Library.lua'))()
-local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
-local SaveManager  = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
+local Library      = loadstring(game:HttpGet(repo .. "Library.lua"))()
+local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
+local SaveManager  = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 
 local Options = getgenv().Options
 local Toggles = getgenv().Toggles
