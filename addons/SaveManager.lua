@@ -205,6 +205,20 @@ local SaveManager = {} do
 		local section = tab:AddRightGroupbox('configuration')
 		local lib = self.Library
 
+		local function setRisk(btn, text)
+			lib:RemoveFromRegistry(btn.Label)
+			lib:AddToRegistry(btn.Label, { TextColor3 = 'RiskColor' })
+			btn.Label.TextColor3 = lib.RiskColor or Color3.fromRGB(255, 50, 50)
+			btn.Label.Text      = text
+		end
+
+		local function resetLabel(btn, text)
+			lib:RemoveFromRegistry(btn.Label)
+			lib:AddToRegistry(btn.Label, { TextColor3 = 'FontColor' })
+			btn.Label.TextColor3 = lib.FontColor
+			btn.Label.Text       = text
+		end
+
 		section:AddInput('SaveManager_ConfigName',    { Text = 'config name' })
 		section:AddDropdown('SaveManager_ConfigList', { Text = 'config list', Values = self:RefreshConfigList(), AllowNull = true })
 
@@ -217,73 +231,57 @@ local SaveManager = {} do
 				return lib:Notify('invalid config name (empty)', 2)
 			end
 			local success, err = self:Save(name)
-			if not success then
-				return lib:Notify('failed to save config: ' .. err)
-			end
+			if not success then return lib:Notify('failed to save config: ' .. err) end
 			lib:Notify(string.format('created config %q', name))
 			Options.SaveManager_ConfigList:SetValues(self:RefreshConfigList())
 			Options.SaveManager_ConfigList:SetValue(nil)
 		end):AddButton('load config', function()
 			local name = Options.SaveManager_ConfigList.Value
 			local success, err = self:Load(name)
-			if not success then
-				return lib:Notify('failed to load config: ' .. err)
-			end
+			if not success then return lib:Notify('failed to load config: ' .. err) end
 			lib:Notify(string.format('loaded config %q', name))
 		end)
 
-		-- overwrite config (confirm in risk color) | delete config (confirm in risk color)
+		-- overwrite config | delete config  (both with two-click confirm in RiskColor)
 		local overwriteConfirming, overwriteTimer = false, nil
-		local overwriteBtn
+		local deleteConfirming,  deleteTimer  = false, nil
+		local overwriteBtn, deleteBtn
+
 		overwriteBtn = section:AddButton('overwrite config', function()
-			local riskColor = lib.RiskColor or Color3.fromRGB(255, 50, 50)
 			if not overwriteConfirming then
 				overwriteConfirming = true
-				overwriteBtn.Label.Text = 'are you sure?'
-				overwriteBtn.Label.TextColor3 = riskColor
+				setRisk(overwriteBtn, 'are you sure?')
 				if overwriteTimer then task.cancel(overwriteTimer) end
 				overwriteTimer = task.delay(3, function()
 					overwriteConfirming = false
-					overwriteBtn.Label.Text = 'overwrite config'
-					overwriteBtn.Label.TextColor3 = lib.FontColor
+					resetLabel(overwriteBtn, 'overwrite config')
 				end)
 			else
 				if overwriteTimer then task.cancel(overwriteTimer) end
 				overwriteConfirming = false
-				overwriteBtn.Label.Text = 'overwrite config'
-				overwriteBtn.Label.TextColor3 = lib.FontColor
+				resetLabel(overwriteBtn, 'overwrite config')
 				local name = Options.SaveManager_ConfigList.Value
 				local success, err = self:Save(name)
-				if not success then
-					return lib:Notify('failed to overwrite config: ' .. err)
-				end
+				if not success then return lib:Notify('failed to overwrite config: ' .. err) end
 				lib:Notify(string.format('overwrote config %q', name))
 			end
 		end)
 
-		local deleteConfirming, deleteTimer = false, nil
-		local deleteBtn
 		deleteBtn = overwriteBtn:AddButton('delete config', function()
-			local riskColor = lib.RiskColor or Color3.fromRGB(255, 50, 50)
 			if not deleteConfirming then
 				deleteConfirming = true
-				deleteBtn.Label.Text = 'are you sure?'
-				deleteBtn.Label.TextColor3 = riskColor
+				setRisk(deleteBtn, 'are you sure?')
 				if deleteTimer then task.cancel(deleteTimer) end
 				deleteTimer = task.delay(3, function()
 					deleteConfirming = false
-					deleteBtn.Label.Text = 'delete config'
-					deleteBtn.Label.TextColor3 = lib.FontColor
+					resetLabel(deleteBtn, 'delete config')
 				end)
 			else
 				if deleteTimer then task.cancel(deleteTimer) end
 				deleteConfirming = false
-				deleteBtn.Label.Text = 'delete config'
-				deleteBtn.Label.TextColor3 = lib.FontColor
+				resetLabel(deleteBtn, 'delete config')
 				local name = Options.SaveManager_ConfigList.Value
-				if not name then
-					return lib:Notify('no config selected')
-				end
+				if not name then return lib:Notify('no config selected') end
 				local path = self.Folder .. '/settings/' .. name .. '.json'
 				if isfile(path) then
 					delfile(path)
@@ -293,6 +291,17 @@ local SaveManager = {} do
 				end
 				Options.SaveManager_ConfigList:SetValues(self:RefreshConfigList())
 				Options.SaveManager_ConfigList:SetValue(nil)
+			end
+		end)
+
+		-- The SubButton (deleteBtn) sizes itself from overwriteBtn.Outer.AbsoluteSize,
+		task.defer(function()
+			if deleteBtn and deleteBtn.Outer and overwriteBtn and overwriteBtn.Outer then
+				local w = overwriteBtn.Outer.AbsoluteSize.X
+				local h = overwriteBtn.Outer.AbsoluteSize.Y
+				if w > 0 then
+					deleteBtn.Outer.Size = UDim2.fromOffset(w - 2, h)
+				end
 			end
 		end)
 
