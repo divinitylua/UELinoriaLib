@@ -30,10 +30,10 @@ local Library = {
     HudRegistry = {};
 
     FontColor = Color3.fromRGB(255, 255, 255);
-    MainColor = Color3.fromRGB(28, 28, 28);
+    MainColor = Color3.fromRGB(24, 24, 24);
     BackgroundColor = Color3.fromRGB(20, 20, 20);
-    AccentColor = Color3.fromRGB(0, 85, 255);
-    OutlineColor = Color3.fromRGB(50, 50, 50);
+    AccentColor = Color3.fromRGB(71, 119, 182);
+    OutlineColor = Color3.fromRGB(31, 31, 31);
     RiskColor = Color3.fromRGB(255, 50, 50),
 
     Black = Color3.new(0, 0, 0);
@@ -48,7 +48,7 @@ local Library = {
     ScreenGui = ScreenGui;
 
     Toggled = false;
-    WireframeDrag = true;
+    WireframeDrag = false;
     UseBlur = false;
     BlurSize = 15;
 
@@ -2844,7 +2844,7 @@ do
         Parent = WatermarkOuter;
     });
     Library:AddToRegistry(WatermarkInner, {
-        BorderColor3 = 'AccentColor';
+        BorderColor3 = 'OutlineColor';
     });
     local InnerFrame = Library:Create('Frame', {
         BackgroundColor3 = Color3.new(1, 1, 1);
@@ -3113,7 +3113,7 @@ function Library:CreateWindow(...)
     if type(Config.TabPadding) ~= 'number' then Config.TabPadding = 0 end
     if type(Config.MenuFadeTime) ~= 'number' then Config.MenuFadeTime = 0.2 end
 
-    if typeof(Config.Size) ~= 'UDim2' then Config.Size = UDim2.fromOffset(530, 640) end
+    if typeof(Config.Size) ~= 'UDim2' then Config.Size = UDim2.fromOffset(550, 600) end
     if typeof(Config.Position) ~= 'UDim2' then Config.Position = UDim2.fromOffset(175, 50) end
 
     if InputService.TouchEnabled then
@@ -3264,24 +3264,6 @@ function Library:CreateWindow(...)
     Library:AddToRegistry(TabContainer, {
         BackgroundColor3 = 'MainColor';
         BorderColor3 = 'OutlineColor';
-    });
-    Outer.ClipsDescendants = true;
-    local CornerCircle = Library:Create('Frame', {
-        AnchorPoint      = Vector2.new(0.5, 0.5);
-        BackgroundColor3 = Library.AccentColor;
-        BackgroundTransparency = 0.5;
-        BorderSizePixel  = 0;
-        Position         = UDim2.new(1, 0, 1, 0);
-        Size             = UDim2.fromOffset(46, 46);
-        ZIndex           = 10;
-        Parent           = Inner;
-    });
-    Library:Create('UICorner', {
-        CornerRadius = UDim.new(1, 0);
-        Parent       = CornerCircle;
-    });
-    Library:AddToRegistry(CornerCircle, {
-        BackgroundColor3 = 'AccentColor';
     });
     function Window:SetWindowTitle(Title)
         WindowLabel.Text = Title;
